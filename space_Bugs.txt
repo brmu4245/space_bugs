@@ -1,112 +1,82 @@
-﻿# Bret L. Murray
+# Bret L. Murray
 # Computer Science Class
-# Video Game example
+# Video Game example / Space Bugs
 # October 23, 2019
-
 
 from microbit import *
 from random import randint
 import time as time
 import music as music
 
-
-
-
-# Opening animation 
 def main():
+# Opening animation images
     space1 = Image( "50005:"
                     "00590:"
                     "09990:"
                     "50090:"
                     "00050")
-
-
     space2 = Image( "05000:"
                     "00090:"
                     "09990:"
                     "05090:"
                     "00005")
-
-
     space3 = Image( "00500:"
                     "00095:"
                     "09990:"
                     "00590:"
                     "50000")
-
-
     space4 = Image( "00050:"
                     "50090:"
                     "09990:"
                     "00090:"
                     "05000")
-
-
     space5 = Image( "50005:"
                     "05090:"
                     "09990:"
                     "00095:"
                     "00500")
-
-
     cont1 = Image(  "05000:"
                     "00900:"
                     "99900:"
                     "50900:"
                     "00050")
-
-
     cont2 = Image(  "00500:"
                     "09050:"
                     "99000:"
                     "09000:"
                     "00005")
-
-
     cont3 = Image(  "00050:"
                     "90005:"
                     "90000:"
                     "90500:"
                     "50000")
-
-
     stars1 = Image( "50005:"
                     "00500:"
                     "00000:"
                     "00050:"
                     "05000")
-
-
     stars2 = Image( "05000:"
                     "00050:"
                     "00000:"
                     "00005:"
                     "00500")
-
-
     stars2 = Image( "00500:"
                     "00005:"
                     "00000:"
                     "50000:"
                     "00050")
-
-
     stars3 = Image( "00050:"
                     "50000:"
                     "00000:"
                     "05000:"
                     "00005")
-
-
     stars4 = Image( "50005:"
                     "05000:"
                     "00000:"
                     "00500:"
                     "50000")
 
-
-
-
+# opening animation instructions
     ships = [space1,space2,space3,space4,space5]
     moveon= [cont1,cont2,cont3]
     stars = [stars1,stars2,stars3,stars4]
@@ -117,17 +87,12 @@ def main():
         display.show(stars,delay = 100)
     display.clear()
 
-
+# Let's play!
     play()
 
-
-
-
-
-
-# contains opening variables and game loop
+# contains initial variables and game loop
 def play():
-    player_x = 2     # player's starting x position on LED grid
+    player_x = 2                    # player's starting x position on LED grid
     num_badguys = 0
     badguy_x = 0
     badguy_y = 0
@@ -135,10 +100,10 @@ def play():
     score = 0    
     level = 1
     
-    start = time.ticks_ms()
+    start = time.ticks_ms()         # keeps track of bad guy positions
 
 
-    while badguy_y < 4:
+    while badguy_y < 4:             # game ends when any bad guy makes it past you
         sleep(100)
 
 
@@ -167,11 +132,9 @@ def play():
             badguy_y = badguy_fwd(num_badguys, badguy_y)
             start = time.ticks_ms()
 
-
     end_game()
     display.scroll("Lv: " + str(level) + " " + str(score) + "pts")
-    return
-
+    return 0
 
 # moves badguy down one after each firing of phaser
 def badguy_fwd(num_badguys, badguy_y):
@@ -195,7 +158,6 @@ def badguy_fwd(num_badguys, badguy_y):
     music.play("C7:1")
     return badguy_y
 
-
 # moves player in direction according to button a or b
 def press_AorB(player_x, pos_neg):
     display.set_pixel(player_x,4,0)
@@ -204,7 +166,6 @@ def press_AorB(player_x, pos_neg):
     sleep(100)
     # music.play("C2:1")
     return player_x
-
 
 # moves phaser blast forward 
 def fire_photon(player_xpos):
@@ -220,7 +181,6 @@ def fire_photon(player_xpos):
         fire = fire - 1
         if fire < 0:
             return False
-
 
 # Keeps badguys returning after another one is shot
 def badguy_hq(num_badguys, level, badguy_x):
@@ -238,21 +198,16 @@ def badguy_hq(num_badguys, level, badguy_x):
         display.set_pixel(badguy_x, 0, 9)
     return num_badguys
 
-
-
-
-   
+# end of game animation and sounds
 def end_game():
     for i in range(0,5):
         display.set_pixel(i,4,9)
         music.play("C8:1")
 
-
-    for i in range(0,5):
+for i in range(0,5):
         display.set_pixel(i,3,9)
         display.set_pixel(i,4,7)
         music.play("C7:1")
-
 
     for i in range(0,5):
         display.set_pixel(i,2,9)
@@ -260,14 +215,12 @@ def end_game():
         display.set_pixel(i,4,5)
         music.play("C6:1")
 
-
     for i in range(0,5):
         display.set_pixel(i,1,9)
         display.set_pixel(i,2,7)
         display.set_pixel(i,3,5)
         display.set_pixel(i,4,3)
         music.play("C5:1")
-
 
     for i in range(0,5):
         display.set_pixel(i,0,9)
@@ -277,7 +230,6 @@ def end_game():
         display.set_pixel(i,4,0)
         music.play("C4:1")
 
-
     for i in range(0,5):
         display.set_pixel(i,0,7)
         display.set_pixel(i,1,5)
@@ -286,7 +238,6 @@ def end_game():
         display.set_pixel(i,4,0)
         music.play("C3:1")
 
-
     for i in range(0,5):
         display.set_pixel(i,0,5)
         display.set_pixel(i,1,3)
@@ -294,6 +245,7 @@ def end_game():
         display.set_pixel(i,3,0)
         display.set_pixel(i,4,0)
         music.play("C2:1")
+        
     for i in range(0,5):
         display.set_pixel(i,0,3)
         display.set_pixel(i,1,0)
@@ -302,8 +254,6 @@ def end_game():
         display.set_pixel(i,4,0)
         music.play("C1:1")
 
-
     display.clear()
-
 
 main()
