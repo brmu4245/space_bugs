@@ -1,0 +1,309 @@
+﻿# Bret L. Murray
+# Computer Science Class
+# Video Game example
+# October 23, 2019
+
+
+from microbit import *
+from random import randint
+import time as time
+import music as music
+
+
+
+
+# Opening animation 
+def main():
+    space1 = Image( "50005:"
+                    "00590:"
+                    "09990:"
+                    "50090:"
+                    "00050")
+
+
+    space2 = Image( "05000:"
+                    "00090:"
+                    "09990:"
+                    "05090:"
+                    "00005")
+
+
+    space3 = Image( "00500:"
+                    "00095:"
+                    "09990:"
+                    "00590:"
+                    "50000")
+
+
+    space4 = Image( "00050:"
+                    "50090:"
+                    "09990:"
+                    "00090:"
+                    "05000")
+
+
+    space5 = Image( "50005:"
+                    "05090:"
+                    "09990:"
+                    "00095:"
+                    "00500")
+
+
+    cont1 = Image(  "05000:"
+                    "00900:"
+                    "99900:"
+                    "50900:"
+                    "00050")
+
+
+    cont2 = Image(  "00500:"
+                    "09050:"
+                    "99000:"
+                    "09000:"
+                    "00005")
+
+
+    cont3 = Image(  "00050:"
+                    "90005:"
+                    "90000:"
+                    "90500:"
+                    "50000")
+
+
+    stars1 = Image( "50005:"
+                    "00500:"
+                    "00000:"
+                    "00050:"
+                    "05000")
+
+
+    stars2 = Image( "05000:"
+                    "00050:"
+                    "00000:"
+                    "00005:"
+                    "00500")
+
+
+    stars2 = Image( "00500:"
+                    "00005:"
+                    "00000:"
+                    "50000:"
+                    "00050")
+
+
+    stars3 = Image( "00050:"
+                    "50000:"
+                    "00000:"
+                    "05000:"
+                    "00005")
+
+
+    stars4 = Image( "50005:"
+                    "05000:"
+                    "00000:"
+                    "00500:"
+                    "50000")
+
+
+
+
+    ships = [space1,space2,space3,space4,space5]
+    moveon= [cont1,cont2,cont3]
+    stars = [stars1,stars2,stars3,stars4]
+    for i in range (0,6):
+        display.show(ships,delay = 100)
+    display.show(moveon,delay = 100)
+    for i in range (0,6):
+        display.show(stars,delay = 100)
+    display.clear()
+
+
+    play()
+
+
+
+
+
+
+# contains opening variables and game loop
+def play():
+    player_x = 2     # player's starting x position on LED grid
+    num_badguys = 0
+    badguy_x = 0
+    badguy_y = 0
+    display.set_pixel(player_x,4,9)  # places ship at (2,4) at start of game.
+    score = 0    
+    level = 1
+    
+    start = time.ticks_ms()
+
+
+    while badguy_y < 4:
+        sleep(100)
+
+
+        num_badguys = badguy_hq(num_badguys, level, badguy_x)
+
+
+        if pin1.read_analog() > 900:
+            destroyed = fire_photon(player_x)
+            if destroyed == True:
+                num_badguys = num_badguys - 1
+                score = score + 1
+                if score % 5 == 0:              # as long as score increases, level is checked
+                    level = level + 1
+                destroyed = False
+            # badguy_y = badguy_fwd(num_badguys, badguy_y)  # Used to advance badguys only when one bad guy is shot
+
+
+        if button_b.is_pressed() and player_x < 4:
+            player_x = press_AorB(player_x, 1)
+
+
+        if button_a.is_pressed() and player_x > 0:
+            player_x = press_AorB(player_x, -1)
+        
+        if time.ticks_diff(time.ticks_ms(), start) > 2000:
+            badguy_y = badguy_fwd(num_badguys, badguy_y)
+            start = time.ticks_ms()
+
+
+    end_game()
+    display.scroll("Lv: " + str(level) + " " + str(score) + "pts")
+    return
+
+
+# moves badguy down one after each firing of phaser
+def badguy_fwd(num_badguys, badguy_y):
+    if num_badguys <= 0:
+        return badguy_y 
+    else:
+        y_values = []
+        x_values = []
+        for x in range(0,5):
+            for y in range(0,4):
+                if display.get_pixel(x,y) > 0:
+                    display.set_pixel(x,y,0)
+                    x_values.append(x)
+                    y_values.append(y)
+        for i in y_values:
+            new_y = i + 1
+            same_x = x_values.pop(0)
+            display.set_pixel(same_x,new_y,9)
+            if new_y > badguy_y:
+                badguy_y = new_y
+    music.play("C7:1")
+    return badguy_y
+
+
+# moves player in direction according to button a or b
+def press_AorB(player_x, pos_neg):
+    display.set_pixel(player_x,4,0)
+    player_x = player_x + pos_neg
+    display.set_pixel(player_x,4,9)
+    sleep(100)
+    # music.play("C2:1")
+    return player_x
+
+
+# moves phaser blast forward 
+def fire_photon(player_xpos):
+    fire = 3
+    while fire > -1:
+        if display.get_pixel(player_xpos,fire) > 0:   
+            display.set_pixel(player_xpos,fire,0)
+            music.play("C4:1")
+            return True
+        display.set_pixel(player_xpos,fire,8)               
+        sleep(100)
+        display.set_pixel(player_xpos,fire,0)
+        fire = fire - 1
+        if fire < 0:
+            return False
+
+
+# Keeps badguys returning after another one is shot
+def badguy_hq(num_badguys, level, badguy_x):
+    while num_badguys < level:
+        num_badguys_online = 0
+        for x in range(0,5):
+            if num_badguys_online == 4:
+                return num_badguys
+            if display.get_pixel(x,0) > 0:
+                num_badguys_online = num_badguys_online + 1
+        num_badguys = num_badguys + 1
+        badguy_x = randint(0,4)
+        while display.get_pixel(badguy_x, 0) > 0:
+            badguy_x = randint(0,4)
+        display.set_pixel(badguy_x, 0, 9)
+    return num_badguys
+
+
+
+
+   
+def end_game():
+    for i in range(0,5):
+        display.set_pixel(i,4,9)
+        music.play("C8:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,3,9)
+        display.set_pixel(i,4,7)
+        music.play("C7:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,2,9)
+        display.set_pixel(i,3,7)
+        display.set_pixel(i,4,5)
+        music.play("C6:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,1,9)
+        display.set_pixel(i,2,7)
+        display.set_pixel(i,3,5)
+        display.set_pixel(i,4,3)
+        music.play("C5:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,0,9)
+        display.set_pixel(i,1,7)
+        display.set_pixel(i,2,5)
+        display.set_pixel(i,3,3)
+        display.set_pixel(i,4,0)
+        music.play("C4:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,0,7)
+        display.set_pixel(i,1,5)
+        display.set_pixel(i,2,3)
+        display.set_pixel(i,3,0)
+        display.set_pixel(i,4,0)
+        music.play("C3:1")
+
+
+    for i in range(0,5):
+        display.set_pixel(i,0,5)
+        display.set_pixel(i,1,3)
+        display.set_pixel(i,2,0)
+        display.set_pixel(i,3,0)
+        display.set_pixel(i,4,0)
+        music.play("C2:1")
+    for i in range(0,5):
+        display.set_pixel(i,0,3)
+        display.set_pixel(i,1,0)
+        display.set_pixel(i,2,0)
+        display.set_pixel(i,3,0)
+        display.set_pixel(i,4,0)
+        music.play("C1:1")
+
+
+    display.clear()
+
+
+main()
